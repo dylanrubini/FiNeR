@@ -5,13 +5,16 @@ modes = tests-gnu tests-gnu-debug
         finer-static-gnu-debug finer-shared-gnu-debug
         finer-static-intel finer-shared-intel
         finer-static-intel-debug finer-shared-intel-debug
+        finer-static-nvhpc
 
 [common-variables]
 $CSHARED_GNU = -c -fPIC -frealloc-lhs
 $CSHARED_INT = -c -fpic -assume realloc_lhs
+$CSHARED_NVH = -c -fPIC
 $LSHARED     = -shared
 $CSTATIC_GNU = -c -frealloc-lhs -std=f2008 -fall-intrinsics
 $CSTATIC_INT = -c -assume realloc_lhs -standard-semantics -std08
+$CSTATIC_NVH = -c 
 $DEBUG_GNU   = -O0 -g3 -Warray-bounds -Wcharacter-truncation -Wline-truncation -Wimplicit-interface -Wimplicit-procedure -Wunderflow -fcheck=all -fmodule-private -ffree-line-length-132 -fimplicit-none -fbacktrace -fdump-core -finit-real=nan
 $DEBUG_INT   = -O0 -debug all -warn all -extend-source 132 -traceback
 $OPTIMIZE    = -O2
@@ -93,6 +96,13 @@ target    = src/lib/finer.f90
 build_dir = ./shared/
 output    = libfiner.so
 mklib     = shared
+
+[finer-static-nvhpc]
+template  = template-static-nvhpc
+target    = src/lib/finer.f90
+build_dir = ./static/
+output    = libfiner.a
+mklib     = static
 
 #templates
 [template-static-gnu]
@@ -206,6 +216,21 @@ colors       = True
 quiet        = False
 log          = True
 jobs         = 10
+
+[template-static-nvhpc]
+compiler     = nvfortran
+cflags       = $CSTATIC_NVH $OPTIMIZE
+lflags       = $OPTIMIZE
+preproc      = -D_R16P
+exclude_dirs = $EXDIRS
+mod_dir      = ./mod/
+obj_dir      = ./obj/
+src          = ./src/
+colors       = True
+quiet        = False
+log          = True
+jobs         = 10
+
 
 # rules
 [rule-makedoc]
